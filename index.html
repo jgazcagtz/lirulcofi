@@ -1,0 +1,934 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lirul Coffee</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            background-color: #fcf9f2;
+            background-size: cover;
+            background-position: center;
+            color: #30691c;
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background-color: #30691c;
+            color: #fcf9f2;
+            border-bottom: 4px solid #ceb174;
+            position: relative;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .instructions {
+            margin: 20px auto;
+            padding: 15px;
+            background-color: #30691c;
+            border-radius: 8px;
+            color: #fcf9f2;
+            max-width: 600px;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+            padding-bottom: 80px; /* Ensure space for footer */
+        }
+
+        h2 {
+            text-align: center;
+            color: #fcf9f2;
+            font-weight: 700;
+            margin: 20px 0;
+            background-color: #30691c;
+            padding: 10px 10px;
+            border-radius: 50px;
+            width: fit-content;
+            margin: 20px auto;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .menu-item {
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            text-align: center;
+            border: 1px solid #30691c;
+            padding: 20px;
+            border-radius: 12px;
+            background-color: #fcf9f2;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .menu-item img {
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+            object-fit: cover;
+            max-width: 250px;
+            max-height: 200px;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item img:hover {
+            transform: rotate(5deg) scale(1.1);
+        }
+
+        .menu-item h3 {
+            margin: 10px 0;
+            font-size: 1.5em;
+            color: #30691c;
+        }
+
+        .menu-item p {
+            margin: 10px 0;
+            color: #333;
+        }
+
+        .choose-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #30691c;
+            color: #fcf9f2;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+        }
+
+        .choose-btn:hover {
+            background-color: #fcf9f2;
+            color: #30691c;
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        #cart {
+            margin-top: 20px;
+            border: 1px solid #30691c;
+            padding: 15px;
+            background-color: #fcf9f2;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 1000;
+            width: 350px;
+            max-width: 90%;
+            display: none;
+            overflow-y: auto;
+            max-height: 80vh;
+        }
+
+        #cart h3 {
+            margin-bottom: 20px;
+        }
+
+        #cart-total {
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            color: #30691c;
+        }
+
+        textarea, input[type="text"], select {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #30691c;
+            border-radius: 8px;
+            background-color: #fcf9f2;
+            color: #30691c;
+            font-size: 0.9em;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .radio-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px;
+            border: 1px solid #30691c;
+            border-radius: 8px;
+            background-color: #fcf9f2;
+            width: 48%;
+            cursor: pointer;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            font-size: 0.9em;
+            color: #30691c;
+        }
+
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+
+        .radio-group input[type="radio"]:checked + label {
+            background-color: #30691c;
+            color: #fcf9f2;
+        }
+
+        #cart-btn {
+            position: fixed;
+            top: 20px;
+            right: 50px;
+            background-color: #30691c;
+            color: #fcf9f2;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+        }
+
+        #cart-btn:hover {
+            background-color: #fcf9f2;
+            color: #30691c;
+            transform: rotate(15deg) scale(1.1);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1002;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        #whatsapp-btn img {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        #whatsapp-btn {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #25D366;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            text-decoration: none;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        #whatsapp-btn:hover {
+            background-color: #22b358;
+            transform: translateY(-3px);
+        }
+
+        #create-order-btn {
+            background-color: #30691c;
+            color: #fcf9f2;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        #create-order-btn:hover {
+            background-color: #fcf9f2;
+            color: #30691c;
+            transform: translateY(-3px);
+        }
+
+        #make-order-btn {
+            background-color: #30691c;
+            color: #fcf9f2;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        #make-order-btn:hover {
+            background-color: #fcf9f2;
+            color: #30691c;
+            transform: translateY(-3px);
+        }
+
+        .edit-btn, #refresh-btn {
+            padding: 8px 16px;
+            background-color: #30691c;
+            color: #fcf9f2;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            text-decoration: none;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .edit-btn:hover, #refresh-btn:hover {
+            background-color: #fcf9f2;
+            color: #30691c;
+            transform: translateY(-3px);
+        }
+
+        #promo-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background-color: #FF6347;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1001;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        #promo-btn:hover {
+            background-color: #FF4500;
+            transform: scale(1.1);
+        }
+
+        #promo-modal {
+            display: none;
+            position: fixed;
+            z-index: 1002;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        #promo-modal .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #30691c;
+            color: #fcf9f2;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            border-top: 4px solid #ceb174;
+            z-index: 100;
+        }
+
+        @media (max-width: 768px) {
+            header img {
+                width: 80px;
+                height: 80px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .choose-btn {
+                font-size: 0.9em;
+            }
+
+            #cart-btn, #promo-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header img {
+                width: 60px;
+                height: 60px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .menu-item img {
+                width: 250px;
+                height: 250px;
+            }
+
+            .menu-item h3 {
+                font-size: 1.2em;
+            }
+
+            .choose-btn {
+                padding: 8px 16px;
+                font-size: 0.9em;
+            }
+
+            #cart {
+                bottom: 5px;
+                right: 5px;
+                width: 90%;
+            }
+
+            .modal-content {
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="https://i.imgur.com/DezlfGS.png" alt="Lirul Coffee Logo" style="width: 400px; height: 400px; object-fit: cover;">
+        
+        <h2>Tu lugar de café favorito ☕</h2>
+    </header>
+
+    <div class="instructions">
+        <p><strong>☕ Haz un pedido en 3 pasos:</strong></p>
+        <p>1. Ingresa tu dirección de entrega y elige el método de pago.</p>
+        <p>2. Haz clic en "Enviar pedido" para enviar tu orden.</p>
+        <p>3. Confirma tu pedido por WhatsApp para registrar tu número.</p>
+    </div>
+
+    <main>
+        <div id="cart">
+            <h3>🛒 Carrito</h3>
+            <div id="cart-items"></div>
+            <p id="cart-total">Total: $0.00</p>
+            <p>🏠Dirección de Entrega:</p>
+            <input type="text" id="delivery-address" placeholder="Ingresa tu dirección aquí...">
+            <p>🏍️Distancia de Entrega (km):</p>
+            <input type="number" id="delivery-distance" placeholder="Distancia en km" onchange="updateDeliveryFee()">
+            <p>Notas:</p>
+            <textarea id="order-notes" placeholder="Agrega notas adicionales..."></textarea>
+            <p>Método de Entrega:</p>
+            <div class="radio-group">
+                <input type="radio" id="domicilio" name="delivery-method" value="A Domicilio" checked onclick="updateCart()">
+                <label for="domicilio">A Domicilio</label>
+                <input type="radio" id="sucursal" name="delivery-method" value="Recoger en Sucursal" onclick="updateCart()">
+                <label for="sucursal">Recoger en Sucursal</label>
+            </div>
+            <p>Método de Pago:</p>
+            <div class="radio-group">
+                <input type="radio" id="online" name="payment-method" value="En línea" checked onclick="updateCart()">
+                <label for="online">En línea</label>
+                <input type="radio" id="efectivo" name="payment-method" value="Efectivo" onclick="updateCart()">
+                <label for="efectivo">Efectivo</label>
+            </div>
+            <p>Pagar con PayPal:</p>
+            <div id="paypal-form"></div>
+            <p>Pagar con Mercado Pago:</p>
+            <a href="https://link.mercadopago.com.mx/segurodeviajes" target="_blank" class="edit-btn">Pagar con Mercado Pago</a>
+            <button id="make-order-btn" onclick="uploadOrder()">Enviar pedido ☕</button>
+            <p><a id="whatsapp-btn" href="#" target="_blank">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WhatsApp"> 
+                Confirmar orden
+              </a></p>
+            <button class="edit-btn" onclick="toggleModal()">Editar Carrito</button>
+            <button id="refresh-btn" onclick="refreshCart()">Iniciar Nuevo Pedido</button>
+        </div>
+        <button id="cart-btn" onclick="toggleCart()">🛒</button>
+
+        <div class="menu-title-container">
+            <h2>Nuestro Menú ☕</h2>
+        </div>
+        <div id="menu" class="menu-grid"></div>
+    </main>
+    
+    <footer>
+        Lirul Coffee &copy;   
+    </footer>
+
+    <div id="edit-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Carrito</h2>
+                <span class="close" onclick="toggleModal()">&times;</span>
+            </div>
+            <div class="modal-body" id="edit-cart-items"></div>
+            <div class="modal-footer">
+                <button class="edit-btn" onclick="toggleModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="toggleProductModal()">&times;</span>
+            <div id="product-modal-content"></div>
+            <button class="choose-btn" onclick="addProductToCart()">Añadir al Carrito</button>
+        </div>
+    </div>
+
+    <!-- Promo Button and Modal -->
+    <button id="promo-btn" onclick="togglePromoModal()">%☕</button>
+
+    <div id="promo-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="togglePromoModal()">&times;</span>
+            <h3>🎉 Promoción Especial 🎉</h3>
+            <p>En la compra de 4 Cafés Grandes o 4 Paninis ($250.00).</p>
+            <p>Llévate un postre de la casa. ¡Totalmente Gratis!</p>
+            <p>Promoción válida de Lunes a Miércoles.</p>
+        </div>
+    </div>
+
+    <script>
+        let total = 0;
+        let orderNumber = null;
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let selectedProduct = null;
+        let deliveryFee = 0;
+
+        const products = [
+            {
+                "name": "Café Americano",
+                "img": "https://i.imgur.com/DezlfGS.png",
+                "price": 45,
+                "description": "Café americano preparado al momento."
+            },
+            {
+                "name": "Cappuccino",
+                "img": "https://i.imgur.com/DezlfGS.png",
+                "price": 55,
+                "description": "Delicioso cappuccino con espuma de leche."
+            },
+            {
+                "name": "Latte",
+                "img": "https://i.imgur.com/DezlfGS.png",
+                "price": 60,
+                "description": "Café latte con leche vaporizada."
+            },
+            {
+                "name": "Mocha",
+                "img": "https://i.imgur.com/DezlfGS.png",
+                "price": 65,
+                "description": "Café mocha con chocolate y crema."
+            },
+            {
+                "name": "Espresso Doble",
+                "img": "https://i.imgur.com/DezlfGS.png",
+                "price": 50,
+                "description": "Doble shot de espresso."
+            },
+            {
+                "name": "Frappuccino",
+                "img": "https://i.imgur.com/DezlfGS.png",
+                "price": 75,
+                "description": "Frappuccino frío con sabor a elegir."
+            },
+            {
+                "name": "Panini de Jamón y Queso",
+                "img": "https://i.imgur.com/DezlfGS.png",
+                "price": 85,
+                "description": "Panini tostado con jamón y queso derretido."
+            },
+            {
+                "name": "Panini Vegetariano",
+                "img": "https://i.imgur.com/DezlfGS.png",
+                "price": 80,
+                "description": "Panini vegetariano con verduras frescas."
+            },
+            {
+                "name": "Muffin de Chocolate",
+                "img": "https://i.imgur.com/DezlfGS.png",
+                "price": 40,
+                "description": "Muffin esponjoso de chocolate."
+            },
+            {
+                "name": "Croissant",
+                "img": "https://i.imgur.com/DezlfGS.png",
+                "price": 35,
+                "description": "Croissant francés recién horneado."
+            },
+            {
+                "name": "Pastel de Zanahoria",
+                "img": "https://i.imgur.com/DezlfGS.png",
+                "price": 50,
+                "description": "Delicioso pastel de zanahoria."
+            },
+            {
+                "name": "Té Verde",
+                "img": "https://i.imgur.com/DezlfGS.png",
+                "price": 45,
+                "description": "Té verde caliente y relajante."
+            },
+            {
+                "name": "Té Chai Latte",
+                "img": "https://i.imgur.com/DezlfGS.png",
+                "price": 65,
+                "description": "Té chai con leche y especias."
+            },
+            {
+                "name": "Smoothie de Frutas",
+                "img": "https://i.imgur.com/DezlfGS.png",
+                "price": 70,
+                "description": "Smoothie de frutas naturales."
+            }
+        ];
+
+        function updateWhatsAppLink() {
+            const whatsappBtn = document.getElementById('whatsapp-btn');
+            const selectedPaymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            const selectedDeliveryMethod = document.querySelector('input[name="delivery-method"]:checked').value;
+            const deliveryAddress = document.getElementById('delivery-address').value || 'No especificada';
+            const orderNotes = document.getElementById('order-notes').value || 'Sin notas adicionales';
+            const message = `Número de Orden: ${orderNumber}\nOrden de Lirul Coffee:\n${cart.map(item => `${item.name} (${item.quantity}) - $${item.price} c/u`).join('\n')}\nTotal: $${(total + deliveryFee).toFixed(2)}\nMétodo de pago: ${selectedPaymentMethod}\nMétodo de entrega: ${selectedDeliveryMethod}\nDirección de Entrega: ${deliveryAddress}\nDistancia: ${document.getElementById('delivery-distance').value} km\nCosto de Envío: $${deliveryFee.toFixed(2)}\nNotas: ${orderNotes}`;
+            const encodedMessage = encodeURIComponent(message);
+            whatsappBtn.href = `https://wa.me/525533355687?text=${encodedMessage}`;
+            whatsappBtn.style.display = total > 0 ? 'inline-flex' : 'none';
+        }
+
+        function calculateDeliveryFee(distance) {
+            if (distance <= 2) {
+                return 20;
+            } else if (distance <= 5) {
+                return 30;
+            } else {
+                return 30 + (distance - 5) * 5;
+            }
+        }
+
+        function updateDeliveryFee() {
+            const deliveryDistance = parseFloat(document.getElementById('delivery-distance').value) || 0;
+            deliveryFee = calculateDeliveryFee(deliveryDistance);
+
+            const existingDeliveryFee = cart.find(item => item.name === 'Costo de Envío');
+
+            if (existingDeliveryFee) {
+                existingDeliveryFee.price = deliveryFee;
+                existingDeliveryFee.quantity = 1;
+            } else {
+                cart.push({ name: 'Costo de Envío', price: deliveryFee, quantity: 1 });
+            }
+
+            updateCart();
+        }
+
+        function updateCart() {
+            const cartItemsSection = document.getElementById('cart-items');
+            const cartTotal = document.getElementById('cart-total');
+            const paypalForm = document.getElementById('paypal-form');
+            const editCartItems = document.getElementById('edit-cart-items');
+
+            cartItemsSection.innerHTML = '';
+            editCartItems.innerHTML = '';
+            total = 0;
+
+            cart.forEach((item, index) => {
+                cartItemsSection.innerHTML += `<p>${item.name} - $${item.price} x ${item.quantity} = $${(item.price * item.quantity).toFixed(2)}</p>`;
+                editCartItems.innerHTML += `
+                    <p>
+                        ${item.name} - 
+                        <button class="quantity-btn" onclick="window.decreaseQuantity(${index})">-</button>
+                        ${item.quantity}
+                        <button class="quantity-btn" onclick="window.increaseQuantity(${index})">+</button>
+                        = $${(item.price * item.quantity).toFixed(2)}
+                        <button onclick="window.removeCartItem(${index})">Eliminar</button>
+                    </p>`;
+                total += item.price * item.quantity;
+            });
+
+            cartTotal.textContent = `Total: $${total.toFixed(2)}`;
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updatePayPalForm();
+            updateWhatsAppLink();
+        }
+
+        function updatePayPalForm() {
+            const paypalForm = document.getElementById('paypal-form');
+            paypalForm.innerHTML = `
+                <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+                    <input type="hidden" name="cmd" value="_xclick" />
+                    <input type="hidden" name="business" value="gascagtz@gmail.com" />
+                    <input type="hidden" name="currency_code" value="MXN" />
+                    <input type="hidden" name="amount" value="${(total).toFixed(2)}" />
+                    <input type="hidden" name="item_name" value="${cart.map(item => `${item.name} (${item.quantity})`).join(', ')}" />
+                    <input type="image" src="https://www.paypalobjects.com/webstatic/en_US/i/btn/png/silver-pill-paypal-44px.png" border="0" name="submit" title="Pay with PayPal" alt="PayPal - The safer, easier way to pay online!" />
+                </form>
+            `;
+        }
+
+        function toggleCart() {
+            const cart = document.getElementById('cart');
+            cart.style.display = cart.style.display === 'none' || cart.style.display === '' ? 'block' : 'none';
+        }
+
+        function toggleModal() {
+            const modal = document.getElementById('edit-modal');
+            modal.style.display = modal.style.display === 'none' || modal.style.display === '' ? 'block' : 'none';
+        }
+
+        function toggleProductModal() {
+            const modal = document.getElementById('product-modal');
+            modal.style.display = modal.style.display === 'none' || modal.style.display === '' ? 'block' : 'none';
+        }
+
+        function togglePromoModal() {
+            const modal = document.getElementById('promo-modal');
+            modal.style.display = modal.style.display === 'none' || modal.style.display === '' ? 'block' : 'none';
+        }
+
+        window.onclick = function(event) {
+            const modals = [
+                document.getElementById('edit-modal'),
+                document.getElementById('product-modal'),
+                document.getElementById('promo-modal')
+            ];
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        }
+
+        function uploadOrder() {
+            if (!orderNumber) {
+                orderNumber = Math.floor(Math.random() * 1000000) + 1;
+            }
+
+            const deliveryAddress = document.getElementById('delivery-address').value || 'No especificada';
+            const orderNotes = document.getElementById('order-notes').value || 'Sin notas adicionales';
+            const selectedPaymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
+            const selectedDeliveryMethod = document.querySelector('input[name="delivery-method"]:checked').value;
+            const deliveryDistance = parseFloat(document.getElementById('delivery-distance').value) || 0;
+
+            const orderData = {
+                timestamp: new Date().toLocaleString(),
+                orderNumber: orderNumber,
+                deliveryAddress: deliveryAddress,
+                orderNotes: orderNotes,
+                paymentMethod: selectedPaymentMethod,
+                deliveryMethod: selectedDeliveryMethod,
+                deliveryDistance: deliveryDistance,
+                deliveryFee: deliveryFee.toFixed(2),
+                cart: JSON.stringify(cart),
+                total: (total + deliveryFee).toFixed(2)
+            };
+
+            updateWhatsAppLink(); // Ensure WhatsApp link is updated before sending the order
+
+            fetch('https://script.google.com/macros/s/AKfycbxB9-728OnNnromP-oOQStESL_srYAQ_aXb2Wv1bROiqlq5jMcLTvYEHjDuzzHBrrWh/exec', {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(orderData)
+            })
+            .then(response => {
+                alert('Pedido enviado correctamente.');
+                document.getElementById('whatsapp-btn').style.display = 'inline-flex';  // Ensure WhatsApp button remains visible
+            })
+            .catch(error => {
+                console.error('Error al enviar el pedido:', error);
+            });
+        }
+
+        window.clearCart = function() {
+            cart.length = 0;
+            updateCart();
+        };
+
+        window.refreshCart = function() {
+            clearCart();
+            localStorage.removeItem('cart');
+            orderNumber = null;
+            document.getElementById('whatsapp-btn').style.display = 'none';
+        };
+
+        window.increaseQuantity = function(index) {
+            cart[index].quantity += 1;
+            updateCart();
+        };
+
+        window.decreaseQuantity = function(index) {
+            if (cart[index].quantity > 1) {
+                cart[index].quantity -= 1;
+            } else {
+                window.removeCartItem(index);
+            }
+            updateCart();
+        };
+
+        window.removeCartItem = function(index) {
+            cart.splice(index, 1);
+            updateCart();
+        };
+
+        window.addProductToCart = function() {
+            const existingProduct = cart.find(item => item.name === selectedProduct.name);
+
+            if (existingProduct) {
+                existingProduct.quantity += selectedProduct.quantity;
+            } else {
+                cart.push({ name: selectedProduct.name, price: selectedProduct.price, quantity: selectedProduct.quantity });
+            }
+
+            updateCart();
+            toggleProductModal();
+            alert(`Producto agregado al carrito: ${selectedProduct.name} x ${selectedProduct.quantity}`);
+        };
+
+        window.showProductModal = function(index) {
+            const product = products[index];
+            const quantitySelect = document.getElementById(`quantity-${index}`);
+            const quantity = parseInt(quantitySelect.value);
+            selectedProduct = { ...product, quantity };
+
+            const modalContent = document.getElementById('product-modal-content');
+            modalContent.innerHTML = `
+                <h3>${selectedProduct.name}</h3>
+                <img src="${selectedProduct.img}" alt="${selectedProduct.name}" style="width: 100%; height: 100%; max-width: 100px; max-height: 100px; object-fit: cover;">
+                <p>Precio: $${selectedProduct.price.toFixed(2)}</p>
+                <p>Descripción: ${selectedProduct.description}</p>
+                <p>Cantidad: ${selectedProduct.quantity}</p>
+            `;
+
+            toggleProductModal();
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            products.forEach((product, index) => {
+                document.getElementById('menu').appendChild(createProductElement(product, index));
+            });
+            updateCart(); // Ensure cart is updated on page load
+        });
+
+        setTimeout(() => {
+            const promoBtn = document.getElementById('promo-btn');
+            promoBtn.classList.add('pulse');
+            setTimeout(() => promoBtn.classList.remove('pulse'), 3000);
+        }, 10000);
+
+        function createProductElement(product, index) {
+            const menuItem = document.createElement('div');
+            menuItem.classList.add('menu-item');
+            menuItem.innerHTML = `
+                <img src="${product.img}" alt="${product.name}">
+                <h3>${product.name}</h3>
+                <p>${product.description}</p>
+                <p>$${product.price}</p>
+                <select id="quantity-${index}">
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                    <option value="4">4</option>
+                    <option value="5">5</option>
+                </select>
+                <p><button class="choose-btn" onclick="window.showProductModal(${index})">Elegir</button></p>
+            `;
+            return menuItem;
+        }
+    </script>
+</body>
+</html>
