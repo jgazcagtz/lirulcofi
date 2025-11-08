@@ -6,6 +6,7 @@ let selectedProduct = null;
 let deliveryFee = 0;
 let currentCategory = 'all';
 let searchQuery = '';
+let currentCheckoutStage = 1;
 
 // Product Data with Categories
 const products = [
@@ -43,11 +44,15 @@ function toggleCart() {
     const drawer = document.getElementById('cart-drawer');
     overlay.classList.toggle('active');
     drawer.classList.toggle('active');
+    
+    // Reset to stage 1 when opening cart
+    if (drawer.classList.contains('active')) {
+        goToStage1();
+    }
 }
 
 function updateCart() {
     const cartItems = document.getElementById('cart-items');
-    const cartTotal = document.getElementById('cart-total');
     const cartEmpty = document.getElementById('cart-empty');
     const cartFooter = document.getElementById('cart-footer');
     const cartBadge = document.getElementById('cart-badge');
@@ -94,23 +99,39 @@ function updateCart() {
         cartItems.appendChild(cartItem);
     });
 
-    const finalTotal = total + deliveryFee;
-    cartTotal.textContent = `$${finalTotal.toFixed(2)}`;
+    // Update summary cards
+    updateOrderSummary();
     
     if (cartWithoutDelivery.length === 0) {
         cartEmpty.style.display = 'block';
         cartFooter.style.display = 'none';
         cartBadge.style.display = 'none';
+        document.getElementById('checkout-stage-1').style.display = 'none';
     } else {
         cartEmpty.style.display = 'none';
         cartFooter.style.display = 'block';
         cartBadge.textContent = cartWithoutDelivery.reduce((sum, item) => sum + item.quantity, 0);
         cartBadge.style.display = 'flex';
+        document.getElementById('checkout-stage-1').style.display = 'block';
     }
 
     localStorage.setItem('cart', JSON.stringify(cart));
     updatePayPalForm();
     updateWhatsAppLink();
+}
+
+function updateOrderSummary() {
+    const finalTotal = total + deliveryFee;
+    
+    // Stage 1 summary
+    document.getElementById('summary-subtotal').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('summary-delivery').textContent = `$${deliveryFee.toFixed(2)}`;
+    document.getElementById('summary-total').textContent = `$${finalTotal.toFixed(2)}`;
+    
+    // Stage 2 summary
+    document.getElementById('final-subtotal').textContent = `$${total.toFixed(2)}`;
+    document.getElementById('final-delivery').textContent = `$${deliveryFee.toFixed(2)}`;
+    document.getElementById('final-total').textContent = `$${finalTotal.toFixed(2)}`;
 }
 
 function addToCart(product, quantity) {
@@ -172,30 +193,40 @@ function updateDeliveryFee() {
 }
 
 function updatePayPalForm() {
-    const paypalForm = document.getElementById('paypal-form');
+    const paypalFormContainer = document.getElementById('paypal-form-container');
     const cartWithoutDelivery = cart.filter(item => item.name !== 'Costo de Envío');
-    paypalForm.innerHTML = `
-        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
-            <input type="hidden" name="cmd" value="_xclick" />
-            <input type="hidden" name="business" value="gascagtz@gmail.com" />
-            <input type="hidden" name="currency_code" value="MXN" />
-            <input type="hidden" name="amount" value="${total.toFixed(2)}" />
-            <input type="hidden" name="item_name" value="${cartWithoutDelivery.map(item => `${item.name} (${item.quantity})`).join(', ')}" />
-            <input type="image" src="https://www.paypalobjects.com/webstatic/en_US/i/btn/png/silver-pill-paypal-44px.png" 
-                   border="0" name="submit" title="Pay with PayPal" 
-                   alt="PayPal - The safer, easier way to pay online!" 
-                   style="cursor: pointer;" />
-        </form>
-    `;
+    const finalTotal = total + deliveryFee;
+    
+    if (paypalFormContainer) {
+        paypalFormContainer.innerHTML = `
+            <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_blank">
+                <input type="hidden" name="cmd" value="_xclick" />
+                <input type="hidden" name="business" value="gascagtz@gmail.com" />
+                <input type="hidden" name="currency_code" value="MXN" />
+                <input type="hidden" name="amount" value="${finalTotal.toFixed(2)}" />
+                <input type="hidden" name="item_name" value="${cartWithoutDelivery.map(item => `${item.name} (${item.quantity})`).join(', ')}" />
+                <input type="image" src="https://www.paypalobjects.com/webstatic/en_US/i/btn/png/silver-pill-paypal-44px.png" 
+                       border="0" name="submit" title="Pay with PayPal" 
+                       alt="PayPal - The safer, easier way to pay online!" 
+                       style="cursor: pointer; width: 100%;" />
+            </form>
+        `;
+    }
 }
 
 function updateWhatsAppLink() {
     const whatsappBtn = document.getElementById('whatsapp-btn');
-    const paymentMethod = document.querySelector('input[name="payment-method"]:checked').value;
-    const deliveryMethod = document.querySelector('input[name="delivery-method"]:checked').value;
-    const address = document.getElementById('delivery-address').value || 'No especificada';
-    const notes = document.getElementById('order-notes').value || 'Sin notas adicionales';
-    const distance = document.getElementById('delivery-distance').value || '0';
+    if (!whatsappBtn) return;
+    
+    const paymentMethodInput = document.querySelector('input[name="payment-method"]:checked');
+    if (!paymentMethodInput) return;
+    
+    const paymentMethod = paymentMethodInput.value;
+    const deliveryMethodInput = document.querySelector('input[name="delivery-method"]:checked');
+    const deliveryMethod = deliveryMethodInput ? deliveryMethodInput.value : 'A Domicilio';
+    const address = document.getElementById('delivery-address')?.value || 'No especificada';
+    const notes = document.getElementById('order-notes')?.value || 'Sin notas adicionales';
+    const distance = document.getElementById('delivery-distance')?.value || '0';
     
     const cartWithoutDelivery = cart.filter(item => item.name !== 'Costo de Envío');
     const finalTotal = total + deliveryFee;
@@ -203,7 +234,107 @@ function updateWhatsAppLink() {
     const message = `Número de Orden: ${orderNumber || 'Pendiente'}\n\nOrden de Lirul Coffee:\n${cartWithoutDelivery.map(item => `${item.name} (${item.quantity}) - $${item.price} c/u`).join('\n')}\n\nTotal: $${finalTotal.toFixed(2)}\nMétodo de pago: ${paymentMethod}\nMétodo de entrega: ${deliveryMethod}\nDirección: ${address}\nDistancia: ${distance} km\nCosto de Envío: $${deliveryFee.toFixed(2)}\nNotas: ${notes}`;
     
     whatsappBtn.href = `https://wa.me/525533355687?text=${encodeURIComponent(message)}`;
-    whatsappBtn.style.display = cartWithoutDelivery.length > 0 ? 'flex' : 'none';
+}
+
+// Checkout Stage Management
+function goToStage1() {
+    currentCheckoutStage = 1;
+    document.getElementById('checkout-stage-1').style.display = 'block';
+    document.getElementById('checkout-stage-2').style.display = 'none';
+    document.getElementById('btn-stage-1').style.display = 'block';
+    document.getElementById('stage-2-buttons').style.display = 'none';
+    document.getElementById('cart-back-btn').style.display = 'none';
+    document.getElementById('cart-header-title').innerHTML = '<i class="fas fa-shopping-cart"></i> Carrito';
+    
+    // Update step indicator
+    document.querySelector('#step-1 .step-number').classList.add('active');
+    document.querySelector('#step-1 .step-number').classList.remove('completed');
+    document.querySelector('#step-2 .step-number').classList.remove('active', 'completed');
+    document.querySelector('.step-line').classList.remove('active');
+}
+
+function goToStage2() {
+    // Validate stage 1
+    const address = document.getElementById('delivery-address').value.trim();
+    if (!address) {
+        showToast('Por favor ingresa una dirección de entrega', 'error');
+        return;
+    }
+
+    currentCheckoutStage = 2;
+    document.getElementById('checkout-stage-1').style.display = 'none';
+    document.getElementById('checkout-stage-2').style.display = 'block';
+    document.getElementById('btn-stage-1').style.display = 'none';
+    document.getElementById('stage-2-buttons').style.display = 'block';
+    document.getElementById('cart-back-btn').style.display = 'flex';
+    document.getElementById('cart-header-title').innerHTML = '<i class="fas fa-credit-card"></i> Pago';
+    
+    // Update step indicator
+    document.querySelector('#step-1 .step-number').classList.remove('active');
+    document.querySelector('#step-1 .step-number').classList.add('completed');
+    document.querySelector('#step-2 .step-number').classList.add('active');
+    document.querySelector('.step-line').classList.add('active');
+    
+    // Update order review
+    updateOrderReview();
+    updatePaymentDetails();
+}
+
+function updateOrderReview() {
+    const reviewItems = document.getElementById('order-review-items');
+    const cartWithoutDelivery = cart.filter(item => item.name !== 'Costo de Envío');
+    
+    reviewItems.innerHTML = '';
+    
+    cartWithoutDelivery.forEach(item => {
+        const reviewItem = document.createElement('div');
+        reviewItem.className = 'cart-item';
+        reviewItem.innerHTML = `
+            <div class="cart-item-info">
+                <div class="cart-item-name">${item.name}</div>
+                <div class="cart-item-price">${item.quantity} x $${item.price.toFixed(2)}</div>
+            </div>
+            <div class="cart-item-actions">
+                <span style="font-weight: 700; color: var(--primary);">$${(item.price * item.quantity).toFixed(2)}</span>
+            </div>
+        `;
+        reviewItems.appendChild(reviewItem);
+    });
+    
+    // Update review info
+    document.getElementById('review-address').textContent = document.getElementById('delivery-address').value || 'No especificada';
+    const deliveryMethod = document.querySelector('input[name="delivery-method"]:checked');
+    document.getElementById('review-delivery-method').textContent = deliveryMethod ? deliveryMethod.value : 'A Domicilio';
+    
+    const notes = document.getElementById('order-notes').value.trim();
+    if (notes) {
+        document.getElementById('review-notes').textContent = notes;
+        document.getElementById('review-notes-row').style.display = 'flex';
+    } else {
+        document.getElementById('review-notes-row').style.display = 'none';
+    }
+}
+
+function updatePaymentDetails() {
+    const paymentMethod = document.querySelector('input[name="payment-method"]:checked');
+    const paymentDetails = document.getElementById('payment-details');
+    const paypalContainer = document.getElementById('paypal-form-container');
+    const mercadopagoContainer = document.getElementById('mercadopago-link-container');
+    
+    if (!paymentMethod) return;
+    
+    if (paymentMethod.value === 'PayPal') {
+        paymentDetails.style.display = 'block';
+        paypalContainer.style.display = 'block';
+        mercadopagoContainer.style.display = 'none';
+        updatePayPalForm();
+    } else if (paymentMethod.value === 'Mercado Pago') {
+        paymentDetails.style.display = 'block';
+        paypalContainer.style.display = 'none';
+        mercadopagoContainer.style.display = 'block';
+    } else {
+        paymentDetails.style.display = 'none';
+    }
 }
 
 function uploadOrder() {
@@ -331,14 +462,37 @@ function togglePromoModal() {
 document.addEventListener('DOMContentLoaded', () => {
     filterProducts();
     updateCart();
+    goToStage1();
     
     // Update WhatsApp link when form changes
     ['delivery-address', 'order-notes', 'delivery-distance'].forEach(id => {
-        document.getElementById(id).addEventListener('input', updateWhatsAppLink);
+        const element = document.getElementById(id);
+        if (element) {
+            element.addEventListener('input', () => {
+                updateWhatsAppLink();
+                if (currentCheckoutStage === 2) {
+                    updateOrderReview();
+                }
+            });
+        }
     });
     
-    document.querySelectorAll('input[name="payment-method"], input[name="delivery-method"]').forEach(input => {
-        input.addEventListener('change', updateWhatsAppLink);
+    // Payment method change handler
+    document.querySelectorAll('input[name="payment-method"]').forEach(input => {
+        input.addEventListener('change', () => {
+            updatePaymentDetails();
+            updateWhatsAppLink();
+        });
+    });
+    
+    // Delivery method change handler
+    document.querySelectorAll('input[name="delivery-method"]').forEach(input => {
+        input.addEventListener('change', () => {
+            updateWhatsAppLink();
+            if (currentCheckoutStage === 2) {
+                updateOrderReview();
+            }
+        });
     });
 });
 

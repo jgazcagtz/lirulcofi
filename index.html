@@ -61,86 +61,215 @@
     <!-- Cart Drawer -->
     <div class="cart-overlay" id="cart-overlay" onclick="toggleCart()"></div>
     <div class="cart-drawer" id="cart-drawer">
+        <!-- Cart Header with Steps -->
         <div class="cart-header">
-            <h2><i class="fas fa-shopping-cart"></i> Carrito</h2>
-            <button class="cart-close" onclick="toggleCart()">
-                <i class="fas fa-times"></i>
-            </button>
+            <div class="cart-header-top">
+                <button class="cart-back-btn" id="cart-back-btn" onclick="goToStage1()" style="display: none;">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2 id="cart-header-title"><i class="fas fa-shopping-cart"></i> Carrito</h2>
+                <button class="cart-close" onclick="toggleCart()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <!-- Step Indicator -->
+            <div class="checkout-steps" id="checkout-steps">
+                <div class="step-indicator">
+                    <div class="step" id="step-1">
+                        <div class="step-number active">1</div>
+                        <div class="step-label">Revisar</div>
+                    </div>
+                    <div class="step-line"></div>
+                    <div class="step" id="step-2">
+                        <div class="step-number">2</div>
+                        <div class="step-label">Pagar</div>
+                    </div>
+                </div>
+            </div>
         </div>
+
         <div class="cart-body" id="cart-body">
+            <!-- Empty Cart State -->
             <div class="cart-empty" id="cart-empty">
                 <i class="fas fa-shopping-cart"></i>
                 <p>Tu carrito está vacío</p>
             </div>
-            <div id="cart-items"></div>
+
+            <!-- Stage 1: Review Cart & Delivery Info -->
+            <div class="checkout-stage" id="checkout-stage-1">
+                <div class="stage-section">
+                    <h3 class="stage-section-title"><i class="fas fa-shopping-bag"></i> Tu Pedido</h3>
+                    <div id="cart-items"></div>
+                </div>
+
+                <div class="stage-section">
+                    <h3 class="stage-section-title"><i class="fas fa-map-marker-alt"></i> Información de Entrega</h3>
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-home"></i> Dirección de Entrega</label>
+                        <input type="text" class="form-input" id="delivery-address" placeholder="Ingresa tu dirección completa...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-route"></i> Distancia (km)</label>
+                        <input type="number" class="form-input" id="delivery-distance" placeholder="0" min="0" step="0.1" onchange="updateDeliveryFee()">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Método de Entrega</label>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="domicilio" name="delivery-method" value="A Domicilio" checked>
+                                <label for="domicilio"><i class="fas fa-motorcycle"></i> A Domicilio</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="sucursal" name="delivery-method" value="Recoger en Sucursal">
+                                <label for="sucursal"><i class="fas fa-store"></i> Recoger</label>
+                            </div>
+                        </div>
         </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label"><i class="fas fa-sticky-note"></i> Notas para el restaurante</label>
+                        <textarea class="form-input" id="order-notes" rows="3" placeholder="Instrucciones especiales, alergias, etc..."></textarea>
+                    </div>
+                </div>
+
+                <!-- Order Summary -->
+                <div class="order-summary-card">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="summary-subtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Costo de Envío</span>
+                        <span id="summary-delivery">$0.00</span>
+                    </div>
+                    <div class="summary-row total-row">
+                        <span>Total</span>
+                        <span id="summary-total">$0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage 2: Payment & Confirmation -->
+            <div class="checkout-stage" id="checkout-stage-2" style="display: none;">
+                <div class="stage-section">
+                    <h3 class="stage-section-title"><i class="fas fa-receipt"></i> Resumen del Pedido</h3>
+                    <div id="order-review-items"></div>
+                    <div class="order-review-info">
+                        <div class="review-info-row">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <strong>Dirección</strong>
+                                <p id="review-address">-</p>
+                            </div>
+                        </div>
+                        <div class="review-info-row">
+                            <i class="fas fa-truck"></i>
+                            <div>
+                                <strong>Método de Entrega</strong>
+                                <p id="review-delivery-method">-</p>
+                            </div>
+                        </div>
+                        <div class="review-info-row" id="review-notes-row" style="display: none;">
+                            <i class="fas fa-sticky-note"></i>
+                            <div>
+                                <strong>Notas</strong>
+                                <p id="review-notes">-</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stage-section">
+                    <h3 class="stage-section-title"><i class="fas fa-credit-card"></i> Método de Pago</h3>
+                    <div class="payment-methods">
+                        <div class="payment-option">
+                            <input type="radio" id="payment-paypal" name="payment-method" value="PayPal">
+                            <label for="payment-paypal">
+                                <div class="payment-icon">
+                                    <i class="fab fa-paypal"></i>
+                                </div>
+                                <div class="payment-info">
+                                    <strong>PayPal</strong>
+                                    <span>Paga con tu cuenta PayPal</span>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" id="payment-mercadopago" name="payment-method" value="Mercado Pago">
+                            <label for="payment-mercadopago">
+                                <div class="payment-icon">
+                                    <i class="fas fa-credit-card"></i>
+                                </div>
+                                <div class="payment-info">
+                                    <strong>Mercado Pago</strong>
+                                    <span>Tarjeta, efectivo o transferencia</span>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </label>
+                        </div>
+                        <div class="payment-option">
+                            <input type="radio" id="payment-cash" name="payment-method" value="Efectivo" checked>
+                            <label for="payment-cash">
+                                <div class="payment-icon">
+                                    <i class="fas fa-money-bill-wave"></i>
+                                </div>
+                                <div class="payment-info">
+                                    <strong>Efectivo</strong>
+                                    <span>Paga al recibir tu pedido</span>
+                                </div>
+                                <i class="fas fa-chevron-right"></i>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Payment Details -->
+                <div id="payment-details" style="display: none;">
+                    <div id="paypal-form-container"></div>
+                    <div id="mercadopago-link-container" style="display: none;">
+                        <a href="https://link.mercadopago.com.mx/segurodeviajes" target="_blank" class="btn btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;">
+                            <i class="fas fa-credit-card"></i> Ir a Mercado Pago
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Final Total -->
+                <div class="order-summary-card">
+                    <div class="summary-row">
+                        <span>Subtotal</span>
+                        <span id="final-subtotal">$0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Costo de Envío</span>
+                        <span id="final-delivery">$0.00</span>
+                    </div>
+                    <div class="summary-row total-row">
+                        <span>Total a Pagar</span>
+                        <span id="final-total">$0.00</span>
+                    </div>
+                </div>
+        </div>
+    </div>
+
+        <!-- Cart Footer with Action Buttons -->
         <div class="cart-footer" id="cart-footer" style="display: none;">
-            <div class="cart-total">
-                <span class="cart-total-label">Total:</span>
-                <span class="cart-total-amount" id="cart-total">$0.00</span>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label"><i class="fas fa-home"></i> Dirección de Entrega</label>
-                <input type="text" class="form-input" id="delivery-address" placeholder="Ingresa tu dirección...">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label"><i class="fas fa-route"></i> Distancia (km)</label>
-                <input type="number" class="form-input" id="delivery-distance" placeholder="0" onchange="updateDeliveryFee()">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label"><i class="fas fa-sticky-note"></i> Notas</label>
-                <textarea class="form-input" id="order-notes" rows="3" placeholder="Notas adicionales..."></textarea>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Método de Entrega</label>
-                <div class="radio-group">
-                    <div class="radio-option">
-                        <input type="radio" id="domicilio" name="delivery-method" value="A Domicilio" checked>
-                        <label for="domicilio">A Domicilio</label>
-                    </div>
-                    <div class="radio-option">
-                        <input type="radio" id="sucursal" name="delivery-method" value="Recoger en Sucursal">
-                        <label for="sucursal">Recoger</label>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">Método de Pago</label>
-                <div class="radio-group">
-                    <div class="radio-option">
-                        <input type="radio" id="online" name="payment-method" value="En línea" checked>
-                        <label for="online">En línea</label>
-                    </div>
-                    <div class="radio-option">
-                        <input type="radio" id="efectivo" name="payment-method" value="Efectivo">
-                        <label for="efectivo">Efectivo</label>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="form-group" id="paypal-section">
-                <label class="form-label">Pagar con PayPal</label>
-                <div id="paypal-form"></div>
-            </div>
-            
-            <div class="form-group">
-                <a href="https://link.mercadopago.com.mx/segurodeviajes" target="_blank" class="btn btn-primary" style="width: 100%; justify-content: center;">
-                    <i class="fas fa-credit-card"></i> Pagar con Mercado Pago
-                </a>
-            </div>
-            
-            <button class="btn-checkout" onclick="uploadOrder()" id="make-order-btn">
-                <i class="fas fa-paper-plane"></i> Enviar Pedido
+            <!-- Stage 1 Button -->
+            <button class="btn-checkout" id="btn-stage-1" onclick="goToStage2()">
+                <i class="fas fa-arrow-right"></i> Continuar al Pago
             </button>
             
-            <a id="whatsapp-btn" href="#" target="_blank" class="btn-checkout" style="background: #25D366; display: none;">
-                <i class="fab fa-whatsapp"></i> Confirmar por WhatsApp
-            </a>
+            <!-- Stage 2 Buttons -->
+            <div id="stage-2-buttons" style="display: none;">
+                <button class="btn-checkout" onclick="uploadOrder()" id="make-order-btn">
+                    <i class="fas fa-check-circle"></i> Confirmar Pedido
+                </button>
+                <a id="whatsapp-btn" href="#" target="_blank" class="btn-checkout" style="background: #25D366; display: none; margin-top: 0.75rem;">
+                    <i class="fab fa-whatsapp"></i> Confirmar por WhatsApp
+                </a>
+            </div>
         </div>
     </div>
 
